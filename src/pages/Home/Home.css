@@ -3,9 +3,10 @@
   display: flex;
   flex-direction: column;
   align-items: flex-end;
-  width: 61%;
+  width: 68%;
   border-radius: 20px;
   padding: 20px;
+  user-select: none;
 }
 
 .home_player_row {
@@ -16,6 +17,8 @@
   gap: 10px;
   font-size: 19px;
   font-weight: 600;
+  margin-left: 20px;
+  margin-right: 20px;
   width: 100%;
   margin-bottom: 15px;
   color: #ffa93c;
@@ -29,4 +32,12 @@
 
 .elapsed_time {
   width: 60px;
+}
+
+.player_buttons {
+  display: flex;
+  flex-direction: row;
+  gap: 20px;
+  margin-left: 20px;
+  margin-right: 20px;
 }

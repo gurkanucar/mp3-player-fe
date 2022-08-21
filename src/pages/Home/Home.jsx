@@ -114,7 +114,8 @@ export const Home = ({ music, socketResponse, sendData }) => {
             onChange={(e) => onVolumeBarChange(e.target.value)}
           />
           <div className="home_player_row">
-            {!playing ? (
+          <div className="player_buttons">
+          {!playing ? (
               <Button
                 onClick={() => {
                   setPlaying(true);
@@ -146,6 +147,7 @@ export const Home = ({ music, socketResponse, sendData }) => {
             >
               <TbPlayerStop color="black" size={25} />
             </Button>
+          </div>
 
             <span className="elapsed_time" ref={elapsedTime}>
               0
