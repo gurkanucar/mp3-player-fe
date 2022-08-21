@@ -52,7 +52,7 @@ export const Home = () => {
         ref={player}
         volume={volume}
         onProgress={(e) => onProgress(e)}
-        url="http://localhost:8080/music1.mp3"
+        url="http://localhost:8080/mp3/music/4.mp3"
         playing={playing}
         //controls
         onPlay={onPlay}
