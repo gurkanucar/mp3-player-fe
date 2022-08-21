@@ -2,11 +2,11 @@ import React from "react";
 
 import "./SeekBar.css";
 
-export const SeekBar = ({ referance, music, onChange , onMouseUp}) => {
+export const SeekBar = ({ referance, music, onChange, onMouseUp }) => {
   return (
-    <div  className="seekBar">
+    <div className="seekBar">
       <input
-      className="seekBar_range"
+        className="seekBar_range"
         ref={referance}
         type="range"
         min={0}

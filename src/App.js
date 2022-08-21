@@ -15,7 +15,7 @@ function App() {
 
   return (
     <div className="App">
-      <Home socketResponse={socketResponse} music={music} sendData={sendData} />
+      <Home socketResponse={socketResponse} music={music} sendData={sendData} isConnected={isConnected}/>
       <h3>{`CONNECTED: ${isConnected}`}</h3>
     </div>
   );

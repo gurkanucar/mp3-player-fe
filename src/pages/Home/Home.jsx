@@ -11,12 +11,13 @@ import {
   COMMAND_VOLUME,
 } from "../../constants/commandNames";
 import { processCommands } from "../../util/commandProcessor";
-
-import { TbPlayerPlay, TbPlayerStop, TbPlayerPause } from "react-icons/tb";
 import "./Home.css";
 import { convertSecond } from "../../util/secondConverter";
+import { PlayerButtons } from "../../components/PlayerButtons/PlayerButtons";
 
-export const Home = ({ music, socketResponse, sendData }) => {
+export const Home = ({ music, socketResponse, sendData, isConnected }) => {
+  const SEND_SYNC_DATA_INTERVAL = 2300;
+
   const [playing, setPlaying] = useState(false);
 
   const [synced, setSynced] = useState(true);
@@ -26,28 +27,26 @@ export const Home = ({ music, socketResponse, sendData }) => {
   const volumeBar = useRef();
   const elapsedTime = useRef();
 
-  const onVolumeBarChange = (val) => {
+  const volumeBarChangeHandler = (val) => {
     sendDataToSocket(COMMAND_VOLUME, val);
     player.current.volume = val / 100;
   };
 
-  const onSeekBarSeekChange = (val) => {
-    onPauseClick();
-    sendDataToSocket(COMMAND_SEEK_TO, parseInt(val));
-    player.current.currentTime = parseInt(val);
+  const seekBarChangeHandler = (val) => {
+    // onPauseClick();
+    sendDataToSocket(COMMAND_SEEK_TO, val);
+    player.current.currentTime = val;
   };
 
   const onPlaying = (e) => {
-    console.log("playing: ", player.current.currentTime);
     seekBar.current.value = player.current.currentTime;
-    sendDataToSocket(COMMAND_SYNC, player.current.currentTime);
+
     elapsedTime.current.innerHTML = convertSecond(
       parseInt(player.current.currentTime)
     );
   };
 
   const sendDataToSocket = (commandName, value) => {
-    console.log("sendDataToSocket", commandName);
     sendData({
       room: "gurkan",
       commandName: commandName,
@@ -55,28 +54,28 @@ export const Home = ({ music, socketResponse, sendData }) => {
     });
   };
 
-  const playMusicFromSocket = () => {
+  const playMusicBySocket = () => {
     player.current.play();
     setPlaying(true);
   };
 
-  const pauseMusicFromSocket = () => {
+  const pauseMusicBySocket = () => {
     player.current.pause();
     setPlaying(false);
   };
 
-  const stopMusicFromSocket = () => {
+  const stopMusicBySocket = () => {
     player.current.pause();
     player.current.currentTime = 0;
     setPlaying(false);
   };
 
-  const socketSeekTo = (val) => {
+  const seekToBySocket = (val) => {
     console.log("socket seek to");
-    player.current.currentTime = parseInt(val);
+    player.current.currentTime = val;
   };
 
-  const socketVolumeTo = (val) => {
+  const volumeBySocket = (val) => {
     player.current.volume = val / 100;
     volumeBar.current.value = val;
     console.log("volume", val);
@@ -92,6 +91,20 @@ export const Home = ({ music, socketResponse, sendData }) => {
   };
   const open = (val) => {};
 
+  useEffect(() => {
+    processCommands(
+      socketResponse,
+      playMusicBySocket,
+      pauseMusicBySocket,
+      stopMusicBySocket,
+      seekToBySocket,
+      volumeBySocket,
+      sync,
+      open
+    );
+  }, [socketResponse]);
+
+  //button operations
   const onPauseClick = () => {
     setPlaying(false);
     player.current.pause();
@@ -110,41 +123,32 @@ export const Home = ({ music, socketResponse, sendData }) => {
     sendDataToSocket(COMMAND_PLAY, "");
   };
 
-  useEffect(() => {
-    processCommands(
-      socketResponse,
-      playMusicFromSocket,
-      pauseMusicFromSocket,
-      stopMusicFromSocket,
-      socketSeekTo,
-      socketVolumeTo,
-      sync,
-      open
-    );
-  }, [socketResponse]);
-
-  useEffect(() => {
-    seekBar.current.max = music.duration;
-  }, []);
-
-  useEffect(() => {
-    console.log(player.current);
-  }, [player.current]);
-
-  const [timeLeft, setTimeLeft] = useState(20);
-
+  //sync operations
+  const [timeLeft, setTimeLeft] = useState(3);
   useEffect(() => {
     if (!timeLeft) return;
-
     const intervalId = setInterval(() => {
       if (socketResponse.commandName == COMMAND_SYNC) {
         setSynced(false);
         setTimeLeft(0);
       }
       setTimeLeft(timeLeft - 1);
-    }, 150);
+    }, 1000);
     return () => clearInterval(intervalId);
   }, [timeLeft]);
+
+  //send sync data
+  useEffect(() => {
+    const interval = setInterval(() => {
+      if (isConnected && synced) {
+        const time = player.current.currentTime;
+        sendDataToSocket(COMMAND_SYNC, time + 0.07);
+      }
+    }, SEND_SYNC_DATA_INTERVAL);
+    return () => {
+      clearInterval(interval);
+    };
+  }, [isConnected]);
 
   return (
     <div>
@@ -161,35 +165,16 @@ export const Home = ({ music, socketResponse, sendData }) => {
         <div className="home_player_card">
           <VolumeBar
             referance={volumeBar}
-            onChange={(e) => onVolumeBarChange(e.target.value)}
+            onChange={(e) => volumeBarChangeHandler(e.target.value)}
           />
           <div className="home_player_row">
             <div className="player_buttons">
-              {!playing ? (
-                <Button
-                  onClick={() => {
-                    onPlayClick();
-                  }}
-                >
-                  <TbPlayerPlay color="black" size={25} />
-                </Button>
-              ) : (
-                <Button
-                  onClick={() => {
-                    onPauseClick();
-                  }}
-                >
-                  <TbPlayerPause color="black" size={25} />
-                </Button>
-              )}
-
-              <Button
-                onClick={() => {
-                  onStopClick();
-                }}
-              >
-                <TbPlayerStop color="black" size={25} />
-              </Button>
+              <PlayerButtons
+                onPauseClick={onPauseClick}
+                onPlayClick={onPlayClick}
+                onStopClick={onStopClick}
+                playing={playing}
+              />
             </div>
 
             <span className="elapsed_time" ref={elapsedTime}>
@@ -199,18 +184,16 @@ export const Home = ({ music, socketResponse, sendData }) => {
               referance={seekBar}
               music={music}
               onMouseUp={() => {
-                onPlayClick();
+                //onPlayClick();
               }}
               onChange={(e) => {
-                onSeekBarSeekChange(e.target.value);
+                seekBarChangeHandler(e.target.value);
               }}
             />
             <span>{convertSecond(music.duration)}</span>
           </div>
         </div>
       </div>
-
-      <button onClick={() => (player.current.currentTime = 20)}>SeekTo</button>
     </div>
   );
 };
