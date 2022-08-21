@@ -15,6 +15,7 @@ export const Home = () => {
   const player = useRef();
   const seekBar = useRef();
   const volumeBar = useRef();
+  const elapsedTime = useRef();
 
   const seekTo = (val) => {
     player.current.seekTo(val);
@@ -27,6 +28,7 @@ export const Home = () => {
   const onSeek = (e) => {
     console.log("onSeek", e);
     seekBar.current.value = player.current.getCurrentTime();
+    elapsedTime.current.innerHTML = parseInt(player.current.getCurrentTime());
   };
 
   const onPlay = () => {
@@ -40,6 +42,7 @@ export const Home = () => {
 
   const onProgress = (e) => {
     seekBar.current.value = player.current.getCurrentTime();
+    elapsedTime.current.innerHTML = parseInt(player.current.getCurrentTime());
   };
 
   return (
@@ -106,6 +109,7 @@ export const Home = () => {
       >
         Stop
       </button>
+      <h4 ref={elapsedTime}>0</h4>
     </div>
   );
 };
