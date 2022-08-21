@@ -1,0 +1,14 @@
+.volumeBar {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+
+.volumeBar__range {
+  margin-top: 30px;
+  margin-bottom: 30px;
+  accent-color: #ffa93c;
+  width: 70px;
+  transform: rotate(270deg);
+}

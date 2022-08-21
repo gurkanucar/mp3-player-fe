@@ -1,4 +1,5 @@
 import React, { useEffect, useRef, useState } from "react";
+import { VolumeBar } from "../components/VolumeBar/VolumeBar";
 import {
   COMMAND_PAUSE,
   COMMAND_PLAY,
@@ -104,16 +105,10 @@ export const HomePage = ({ music, socketResponse, sendData }) => {
         step="0.25"
         style={{ width: "248px" }}
       />
-      <input
-        ref={volumeBar}
-        id="volume"
-        type="range"
-        min={0}
-        defaultValue={80}
+
+      <VolumeBar
+        referance={volumeBar}
         onChange={(e) => onVolumeBarChange(e.target.value)}
-        max={100}
-        step="1"
-        style={{ width: "48px" }}
       />
 
       <button onClick={() => (player.current.currentTime = 20)}>SeekTo</button>

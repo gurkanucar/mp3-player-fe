@@ -2,6 +2,7 @@ import "./App.css";
 import React, { useState } from "react";
 import { useSocket } from "./customHooks/useSocket";
 import { HomePage } from "./pages/Home";
+import { VolumeBar } from "./components/VolumeBar/VolumeBar";
 
 function App() {
   const { socketResponse, isConnected, sendData } = useSocket("gurkan");
