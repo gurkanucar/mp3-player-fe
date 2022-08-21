@@ -7,6 +7,7 @@ import {
   COMMAND_PLAY,
   COMMAND_SEEK_TO,
   COMMAND_STOP,
+  COMMAND_SYNC,
   COMMAND_VOLUME,
 } from "../../constants/commandNames";
 import { processCommands } from "../../util/commandProcessor";
@@ -17,6 +18,8 @@ import { convertSecond } from "../../util/secondConverter";
 
 export const Home = ({ music, socketResponse, sendData }) => {
   const [playing, setPlaying] = useState(false);
+
+  const [synced, setSynced] = useState(true);
 
   const player = useRef();
   const seekBar = useRef();
@@ -29,13 +32,14 @@ export const Home = ({ music, socketResponse, sendData }) => {
   };
 
   const onSeekBarSeekChange = (val) => {
-    sendDataToSocket(COMMAND_SEEK_TO, val);
-    player.current.currentTime = val;
+    sendDataToSocket(COMMAND_SEEK_TO, parseInt(val));
+    player.current.currentTime = parseInt(val);
   };
 
   const onPlaying = (e) => {
     console.log("playing: ", player.current.currentTime);
     seekBar.current.value = player.current.currentTime;
+    sendDataToSocket(COMMAND_SYNC, player.current.currentTime);
     elapsedTime.current.innerHTML = convertSecond(
       parseInt(player.current.currentTime)
     );
@@ -68,7 +72,7 @@ export const Home = ({ music, socketResponse, sendData }) => {
 
   const socketSeekTo = (val) => {
     console.log("socket seek to");
-    player.current.currentTime = val;
+    player.current.currentTime = parseInt(val);
   };
 
   const socketVolumeTo = (val) => {
@@ -77,6 +81,16 @@ export const Home = ({ music, socketResponse, sendData }) => {
     console.log("volume", val);
   };
 
+  const sync = (val) => {
+    if (!synced) {
+      setSynced(true);
+      player.current.currentTime = val;
+      setPlaying(true);
+      player.current.play();
+    }
+  };
+  const open = (val) => {};
+
   useEffect(() => {
     processCommands(
       socketResponse,
@@ -84,7 +98,9 @@ export const Home = ({ music, socketResponse, sendData }) => {
       pauseMusicFromSocket,
       stopMusicFromSocket,
       socketSeekTo,
-      socketVolumeTo
+      socketVolumeTo,
+      sync,
+      open
     );
   }, [socketResponse]);
 
@@ -95,6 +111,21 @@ export const Home = ({ music, socketResponse, sendData }) => {
   useEffect(() => {
     console.log(player.current);
   }, [player.current]);
+
+  const [timeLeft, setTimeLeft] = useState(20);
+
+  useEffect(() => {
+    if (!timeLeft) return;
+
+    const intervalId = setInterval(() => {
+      if (socketResponse.commandName == COMMAND_SYNC) {
+        setSynced(false);
+        setTimeLeft(0);
+      }
+      setTimeLeft(timeLeft - 1);
+    }, 150);
+    return () => clearInterval(intervalId);
+  }, [timeLeft]);
 
   return (
     <div>
@@ -114,43 +145,43 @@ export const Home = ({ music, socketResponse, sendData }) => {
             onChange={(e) => onVolumeBarChange(e.target.value)}
           />
           <div className="home_player_row">
-          <div className="player_buttons">
-          {!playing ? (
-              <Button
-                onClick={() => {
-                  setPlaying(true);
-                  player.current.play();
-                  sendDataToSocket(COMMAND_PLAY, "");
-                }}
-              >
-                <TbPlayerPlay color="black" size={25} />
-              </Button>
-            ) : (
+            <div className="player_buttons">
+              {!playing ? (
+                <Button
+                  onClick={() => {
+                    setPlaying(true);
+                    player.current.play();
+                    sendDataToSocket(COMMAND_PLAY, "");
+                  }}
+                >
+                  <TbPlayerPlay color="black" size={25} />
+                </Button>
+              ) : (
+                <Button
+                  onClick={() => {
+                    setPlaying(false);
+                    player.current.pause();
+                    sendDataToSocket(COMMAND_PAUSE, "");
+                  }}
+                >
+                  <TbPlayerPause color="black" size={25} />
+                </Button>
+              )}
+
               <Button
                 onClick={() => {
                   setPlaying(false);
                   player.current.pause();
-                  sendDataToSocket(COMMAND_PAUSE, "");
+                  player.current.currentTime = 0;
+                  sendDataToSocket(COMMAND_STOP, "");
                 }}
               >
-                <TbPlayerPause color="black" size={25} />
+                <TbPlayerStop color="black" size={25} />
               </Button>
-            )}
-
-            <Button
-              onClick={() => {
-                setPlaying(false);
-                player.current.pause();
-                player.current.currentTime = 0;
-                sendDataToSocket(COMMAND_STOP, "");
-              }}
-            >
-              <TbPlayerStop color="black" size={25} />
-            </Button>
-          </div>
+            </div>
 
             <span className="elapsed_time" ref={elapsedTime}>
-              0
+              0:00
             </span>
             <SeekBar
               referance={seekBar}

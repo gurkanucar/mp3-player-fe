@@ -1,8 +1,10 @@
 import {
+  COMMAND_OPEN,
   COMMAND_PAUSE,
   COMMAND_PLAY,
   COMMAND_SEEK_TO,
   COMMAND_STOP,
+  COMMAND_SYNC,
   COMMAND_VOLUME,
 } from "../constants/commandNames";
 
@@ -12,7 +14,9 @@ export const processCommands = (
   pauseMusic,
   stopMusic,
   seekTo,
-  setVolumeTo
+  setVolumeTo,
+  sync,
+  open
 ) => {
   switch (socketResponse.commandName) {
     case COMMAND_PLAY:
@@ -35,6 +39,14 @@ export const processCommands = (
       setVolumeTo(socketResponse.value);
       console.log("setVolume", socketResponse.value);
       break;
+      case COMMAND_SYNC:
+        sync(socketResponse.value);
+        console.log("sync", socketResponse.value);
+        break;
+        case COMMAND_OPEN:
+          open(socketResponse.value);
+          console.log("open", socketResponse.value);
+          break;
     default:
       console.log("command not found!");
   }
