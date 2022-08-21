@@ -6,7 +6,7 @@ import * as io from "socket.io-client";
 import ReactPlayer from "react-player/file";
 import { Home } from "./pages/Home";
 import { useSocket } from "./customHooks/useSocket";
-import { SOCKET_BASE_URL } from "./components/constants/apiConstants";
+import { SOCKET_BASE_URL } from "./constants/apiConstants";
 
 function App() {
   const { data, isConnected, sendData } = useSocket("gurkan");
