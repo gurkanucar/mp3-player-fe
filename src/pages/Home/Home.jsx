@@ -32,6 +32,7 @@ export const Home = ({ music, socketResponse, sendData }) => {
   };
 
   const onSeekBarSeekChange = (val) => {
+    onPauseClick();
     sendDataToSocket(COMMAND_SEEK_TO, parseInt(val));
     player.current.currentTime = parseInt(val);
   };
@@ -91,6 +92,24 @@ export const Home = ({ music, socketResponse, sendData }) => {
   };
   const open = (val) => {};
 
+  const onPauseClick = () => {
+    setPlaying(false);
+    player.current.pause();
+    sendDataToSocket(COMMAND_PAUSE, "");
+  };
+
+  const onStopClick = () => {
+    setPlaying(false);
+    player.current.pause();
+    player.current.currentTime = 0;
+    sendDataToSocket(COMMAND_STOP, "");
+  };
+  const onPlayClick = () => {
+    setPlaying(true);
+    player.current.play();
+    sendDataToSocket(COMMAND_PLAY, "");
+  };
+
   useEffect(() => {
     processCommands(
       socketResponse,
@@ -149,9 +168,7 @@ export const Home = ({ music, socketResponse, sendData }) => {
               {!playing ? (
                 <Button
                   onClick={() => {
-                    setPlaying(true);
-                    player.current.play();
-                    sendDataToSocket(COMMAND_PLAY, "");
+                    onPlayClick();
                   }}
                 >
                   <TbPlayerPlay color="black" size={25} />
@@ -159,9 +176,7 @@ export const Home = ({ music, socketResponse, sendData }) => {
               ) : (
                 <Button
                   onClick={() => {
-                    setPlaying(false);
-                    player.current.pause();
-                    sendDataToSocket(COMMAND_PAUSE, "");
+                    onPauseClick();
                   }}
                 >
                   <TbPlayerPause color="black" size={25} />
@@ -170,10 +185,7 @@ export const Home = ({ music, socketResponse, sendData }) => {
 
               <Button
                 onClick={() => {
-                  setPlaying(false);
-                  player.current.pause();
-                  player.current.currentTime = 0;
-                  sendDataToSocket(COMMAND_STOP, "");
+                  onStopClick();
                 }}
               >
                 <TbPlayerStop color="black" size={25} />
@@ -186,6 +198,9 @@ export const Home = ({ music, socketResponse, sendData }) => {
             <SeekBar
               referance={seekBar}
               music={music}
+              onMouseUp={() => {
+                onPlayClick();
+              }}
               onChange={(e) => {
                 onSeekBarSeekChange(e.target.value);
               }}
