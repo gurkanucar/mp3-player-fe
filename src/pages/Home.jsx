@@ -1,13 +1,15 @@
 import React, { useEffect, useRef, useState } from "react";
 import ReactPlayer from "react-player/file";
-export const Home = () => {
-  //   const [details, setDetails] = useState({
-  //     min: 0,
-  //     max: 0,
-  //     currentSeek: 0,
-  //     durationOfVideo: 0,
-  //   });
+import {
+  COMMAND_PAUSE,
+  COMMAND_PLAY,
+  COMMAND_SEEK_TO,
+  COMMAND_STOP,
+  COMMAND_VOLUME,
+} from "../constants/commandNames";
 
+import { commandProcessor } from "../util/commandProcessor";
+export const Home = ({ socketResponse, sendData, music }) => {
   const [playing, setPlaying] = useState(false);
 
   const [volume, setVolume] = useState(0.8);
@@ -17,12 +19,41 @@ export const Home = () => {
   const volumeBar = useRef();
   const elapsedTime = useRef();
 
+  const stopMusic = () => {
+    setPlaying(false);
+    player.current.seekTo(0);
+  };
+
+  const pauseMusic = () => {
+    setPlaying(false);
+  };
+
   const seekTo = (val) => {
     player.current.seekTo(val);
+    console.log("seekTo called", val);
+  };
+
+  const seekSend = (val) => {
+    sendData({
+      room: "gurkan",
+      commandName: "SEEK_TO",
+      value: val.toString(),
+    });
+    console.log("seek send");
   };
 
   const volumeTo = (val) => {
     setVolume(val / 100);
+    volumeBar.current.value = val;
+  };
+
+  const volumeSend = (val) => {
+    sendData({
+      room: "gurkan",
+      commandName: "VOLUME",
+      value: val.toString(),
+    });
+    console.log("seek send");
   };
 
   const onSeek = (e) => {
@@ -31,19 +62,22 @@ export const Home = () => {
     elapsedTime.current.innerHTML = parseInt(player.current.getCurrentTime());
   };
 
-  const onPlay = () => {
-    seekBar.current.max = player.current.getDuration();
-    console.log("onPlay");
-  };
-
-  const onPause = (e) => {
-    console.log("onPause", e);
-  };
-
   const onProgress = (e) => {
     seekBar.current.value = player.current.getCurrentTime();
     elapsedTime.current.innerHTML = parseInt(player.current.getCurrentTime());
   };
+
+  useEffect(() => {
+    commandProcessor(
+      socketResponse,
+      setPlaying,
+      pauseMusic,
+      stopMusic,
+      seekTo,
+      volumeTo
+    );
+    seekBar.current.max = music.duration;
+  }, [socketResponse]);
 
   return (
     <div>
@@ -52,11 +86,9 @@ export const Home = () => {
         ref={player}
         volume={volume}
         onProgress={(e) => onProgress(e)}
-        url="http://localhost:8080/mp3/music/4.mp3"
+        url={music.url}
         playing={playing}
         //controls
-        onPlay={onPlay}
-        onPause={onPause}
         onSeek={onSeek}
         config={{
           file: {
@@ -71,6 +103,7 @@ export const Home = () => {
         min={0}
         onChange={(e) => {
           seekTo(e.target.value);
+          seekSend(e.target.value);
         }}
         defaultValue={0}
         step="0.25"
@@ -84,6 +117,7 @@ export const Home = () => {
         min={0}
         onChange={(e) => {
           volumeTo(e.target.value);
+          volumeSend(e.target.value);
         }}
         defaultValue={80}
         max={100}
@@ -92,23 +126,33 @@ export const Home = () => {
       />
 
       <button onClick={() => player.current.seekTo(20)}>SeekTo</button>
-      <button onClick={() => setPlaying(true)}>Play</button>
       <button
         onClick={() => {
           setPlaying(true);
-          setPlaying(false);
+          console.log(player.current.player);
+          sendData({
+            room: "gurkan",
+            commandName: "PLAY",
+            value: "",
+          });
+        }}
+      >
+        Play
+      </button>
+      <button
+        onClick={() => {
+          pauseMusic();
+          console.log(player.current.player);
+          sendData({
+            room: "gurkan",
+            commandName: "PAUSE",
+            value: "",
+          });
         }}
       >
         Pause
       </button>
-      <button
-        onClick={() => {
-          setPlaying(false);
-          player.current.seekTo(0);
-        }}
-      >
-        Stop
-      </button>
+      <button onClick={stopMusic}>Stop</button>
       <h4 ref={elapsedTime}>0</h4>
     </div>
   );
