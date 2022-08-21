@@ -4,23 +4,21 @@ import { SOCKET_BASE_URL } from "../components/constants/apiConstants";
 
 export const useSocket = (room) => {
   const [socket, setSocket] = useState();
-
   const [data, setData] = useState({
     commandName: "",
     value: "",
   });
   const [isConnected, setConnected] = useState(false);
-
-  const sendData = useCallback((payload) => {
-    if (socket != undefined) {
+  const sendData = useCallback(
+    (payload) => {
       socket.emit("commands", {
         room: room,
         commandName: payload.commandName,
         value: payload.value,
       });
-    }
-  }, []);
-
+    },
+    [socket, room]
+  );
   useEffect(() => {
     const s = io(SOCKET_BASE_URL, {
       reconnection: false,
@@ -28,7 +26,7 @@ export const useSocket = (room) => {
     });
     setSocket(s);
     s.on("connect", () => setConnected(true));
-    s.on("commands", (res) => {
+    s.on("get_command", (res) => {
       setData({
         commandName: res.commandName,
         value: res.value,
@@ -39,5 +37,5 @@ export const useSocket = (room) => {
     };
   }, [room]);
 
-  return { data, isConnected };
+  return { data, isConnected, sendData };
 };
