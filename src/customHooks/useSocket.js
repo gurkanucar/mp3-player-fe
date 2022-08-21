@@ -4,7 +4,7 @@ import { SOCKET_BASE_URL } from "../constants/apiConstants";
 
 export const useSocket = (room) => {
   const [socket, setSocket] = useState();
-  const [data, setData] = useState({
+  const [socketResponse, setSocketResponse] = useState({
     commandName: "",
     value: "",
   });
@@ -27,7 +27,7 @@ export const useSocket = (room) => {
     setSocket(s);
     s.on("connect", () => setConnected(true));
     s.on("get_command", (res) => {
-      setData({
+      setSocketResponse({
         commandName: res.commandName,
         value: res.value,
       });
@@ -37,5 +37,5 @@ export const useSocket = (room) => {
     };
   }, [room]);
 
-  return { data, isConnected, sendData };
+  return { socketResponse, isConnected, sendData };
 };
