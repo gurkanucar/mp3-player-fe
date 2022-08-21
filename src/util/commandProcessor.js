@@ -6,18 +6,18 @@ import {
   COMMAND_VOLUME,
 } from "../constants/commandNames";
 
-export const commandProcessor = (
+export const processCommands = (
   socketResponse,
-  setPlaying,
+  playMusic,
   pauseMusic,
   stopMusic,
   seekTo,
-  setVolumeFromSocket
+  setVolumeTo
 ) => {
   switch (socketResponse.commandName) {
     case COMMAND_PLAY:
+      playMusic();
       console.log("play from Socket");
-      setPlaying(true);
       break;
     case COMMAND_PAUSE:
       pauseMusic();
@@ -32,7 +32,7 @@ export const commandProcessor = (
       console.log("seekTo from Socket", socketResponse.value);
       break;
     case COMMAND_VOLUME:
-      setVolumeFromSocket(socketResponse.value);
+      setVolumeTo(socketResponse.value);
       console.log("setVolume", socketResponse.value);
       break;
     default:
