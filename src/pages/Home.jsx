@@ -1,5 +1,4 @@
 import React, { useEffect, useRef, useState } from "react";
-import ReactAudioPlayer from "react-audio-player";
 import {
   COMMAND_PAUSE,
   COMMAND_PLAY,
@@ -7,7 +6,7 @@ import {
   COMMAND_STOP,
   COMMAND_VOLUME,
 } from "../constants/commandNames";
-import { commandProcessor } from "../util/commandProcessor";
+import { processCommands } from "../util/commandProcessor";
 
 export const HomePage = ({ music, socketResponse, sendData }) => {
   const player = useRef();
@@ -63,7 +62,7 @@ export const HomePage = ({ music, socketResponse, sendData }) => {
   };
 
   useEffect(() => {
-    commandProcessor(
+    processCommands(
       socketResponse,
       playMusicFromSocket,
       pauseMusicFromSocket,
