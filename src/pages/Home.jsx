@@ -12,11 +12,10 @@ import { commandProcessor } from "../util/commandProcessor";
 export const Home = ({ socketResponse, sendData, music }) => {
   const [playing, setPlaying] = useState(false);
 
-  const [volume, setVolume] = useState(0.8);
+  const [volume, setVolume] = useState(100);
 
   const player = useRef();
   const seekBar = useRef();
-  const volumeBar = useRef();
   const elapsedTime = useRef();
 
   const stopMusic = () => {
@@ -42,18 +41,18 @@ export const Home = ({ socketResponse, sendData, music }) => {
     console.log("seek send");
   };
 
-  const volumeTo = (val) => {
-    setVolume(val / 100);
-    volumeBar.current.value = val;
+  const setVolumeFromSocket = (val) => {
+    setVolume(val);
   };
 
   const volumeSend = (val) => {
+    setVolume(val);
     sendData({
       room: "gurkan",
       commandName: "VOLUME",
-      value: val.toString(),
+      value: val,
     });
-    console.log("seek send");
+    console.log("volumeSend");
   };
 
   const onSeek = (e) => {
@@ -74,7 +73,7 @@ export const Home = ({ socketResponse, sendData, music }) => {
       pauseMusic,
       stopMusic,
       seekTo,
-      volumeTo
+      setVolumeFromSocket
     );
     seekBar.current.max = music.duration;
   }, [socketResponse]);
@@ -84,7 +83,7 @@ export const Home = ({ socketResponse, sendData, music }) => {
       <ReactPlayer
         height="60px"
         ref={player}
-        volume={volume}
+        volume={volume / 100}
         onProgress={(e) => onProgress(e)}
         url={music.url}
         playing={playing}
@@ -111,15 +110,11 @@ export const Home = ({ socketResponse, sendData, music }) => {
       />
 
       <input
-        ref={volumeBar}
         id="volume"
         type="range"
         min={0}
-        onChange={(e) => {
-          volumeTo(e.target.value);
-          volumeSend(e.target.value);
-        }}
-        defaultValue={80}
+        value={volume}
+        onChange={(e) => volumeSend(e.target.value)}
         max={100}
         step="1"
         style={{ width: "48px" }}

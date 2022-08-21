@@ -12,7 +12,7 @@ export const commandProcessor = (
   pauseMusic,
   stopMusic,
   seekTo,
-  volumeTo
+  setVolumeFromSocket
 ) => {
   switch (socketResponse.commandName) {
     case COMMAND_PLAY:
@@ -32,7 +32,7 @@ export const commandProcessor = (
       console.log("seekTo from Socket", socketResponse.value);
       break;
     case COMMAND_VOLUME:
-      volumeTo(socketResponse.value);
+      setVolumeFromSocket(socketResponse.value);
       console.log("setVolume", socketResponse.value);
       break;
     default:
