@@ -1,22 +1,58 @@
 import "./App.css";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useSocket } from "./customHooks/useSocket";
 import { Home } from "./pages/Home/Home";
 import { VolumeBar } from "./components/VolumeBar/VolumeBar";
+import { useFetch } from "./customHooks/useFetch";
+import { MusicList } from "./components/MusicList/MusicList";
+import {
+  convertSecond,
+  millisToMinutesAndSeconds,
+} from "./util/secondConverter";
+import { API_BASE_URL } from "./constants/apiConstants";
 
 function App() {
   const { socketResponse, isConnected, sendData } = useSocket("gurkan");
 
+  const { responseData, loading, error } = useFetch("/mp3/music");
+
+  const [selectedMusic, setSelectedMusic] = useState(1);
+
   const [music, setMusic] = useState({
-    name: "",
-    url: "http://192.168.0.10:8080/mp3/music/2.mp3",
-    duration: "260",
+    id: -1,
+    duration: "0:00",
   });
+
+  useEffect(() => {
+    if (responseData == null) return;
+    let tmp = { ...responseData.find((x) => x.id == selectedMusic) };
+    tmp.duration = millisToMinutesAndSeconds(tmp.duration).toString();
+    tmp.url = API_BASE_URL + "/mp3/music/" + tmp.id + ".mp3";
+    console.log(tmp);
+    setMusic(tmp);
+  }, [selectedMusic]);
 
   return (
     <div className="App">
-      <Home socketResponse={socketResponse} music={music} sendData={sendData} isConnected={isConnected}/>
+      <Home
+        musicList={responseData}
+        socketResponse={socketResponse}
+        music={music}
+        sendData={sendData}
+        isConnected={isConnected}
+        setSelectedMusic={setSelectedMusic}
+      />
       <h3>{`CONNECTED: ${isConnected}`}</h3>
+      <div>
+        {responseData != null ? (
+          <MusicList
+            musicList={responseData}
+            setSelectedMusic={setSelectedMusic}
+          />
+        ) : (
+          <span>loading...</span>
+        )}
+      </div>
     </div>
   );
 }
