@@ -1,7 +1,7 @@
 import "./App.css";
 import React, { useState } from "react";
 import { useSocket } from "./customHooks/useSocket";
-import { HomePage } from "./pages/Home";
+import { Home } from "./pages/Home/Home";
 import { VolumeBar } from "./components/VolumeBar/VolumeBar";
 
 function App() {
@@ -15,11 +15,7 @@ function App() {
 
   return (
     <div className="App">
-      <HomePage
-        socketResponse={socketResponse}
-        music={music}
-        sendData={sendData}
-      />
+      <Home socketResponse={socketResponse} music={music} sendData={sendData} />
       <h3>{`CONNECTED: ${isConnected}`}</h3>
     </div>
   );

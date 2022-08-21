@@ -1,0 +1,28 @@
+.home_player_card {
+  background-color: #2d3748;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  width: 55%;
+  border-radius: 20px;
+  padding: 20px;
+}
+
+.home_player_row {
+  margin-right: 100px;
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  align-items: center;
+  gap: 10px;
+  font-size: 19px;
+  font-weight: 600;
+  margin-bottom: 15px;
+  color: #ffa93c;
+}
+
+.home_player_card_root {
+  display: flex;
+  justify-content: center;
+  margin: 20px;
+}
