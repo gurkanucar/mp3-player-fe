@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from "react";
-import ReactPlayer from "react-player/file";
+import ReactPlayer from "react-player/lazy";
 import {
   COMMAND_PAUSE,
   COMMAND_PLAY,
@@ -10,7 +10,7 @@ import {
 
 import { commandProcessor } from "../util/commandProcessor";
 export const Home = ({ socketResponse, sendData, music }) => {
-  const [playing, setPlaying] = useState(false);
+  const [playing, setPlaying] = useState(true);
 
   const [volume, setVolume] = useState(100);
 
@@ -77,6 +77,11 @@ export const Home = ({ socketResponse, sendData, music }) => {
     );
     seekBar.current.max = music.duration;
   }, [socketResponse]);
+
+  useEffect(() => {
+    seekBar.current.max = music.duration;
+    setPlaying(false);
+  }, [music]);
 
   return (
     <div>

@@ -7,19 +7,21 @@ import ReactPlayer from "react-player/file";
 import { Home } from "./pages/Home";
 import { useSocket } from "./customHooks/useSocket";
 import { SOCKET_BASE_URL } from "./constants/apiConstants";
+import { TestPage } from "./pages/TestPage";
 
 function App() {
   const { socketResponse, isConnected, sendData } = useSocket("gurkan");
 
   const [music, setMusic] = useState({
     name: "",
-    url: "http://192.168.0.10:8080/mp3/music/4.mp3",
-    duration: "49",
+    url: "http://192.168.0.10:8080/mp3/music/2.mp3",
+    duration: "260",
   });
 
   return (
     <div className="App">
-      <Home socketResponse={socketResponse} music={music} sendData={sendData} />
+      {/* <Home socketResponse={socketResponse} music={music} sendData={sendData} /> */}
+      <TestPage socketResponse={socketResponse} music={music} sendData={sendData} />
       <h3>{`CONNECTED: ${isConnected}`}</h3>
       <h3>{`DATA: ${JSON.stringify(socketResponse)}`}</h3>
       <button
