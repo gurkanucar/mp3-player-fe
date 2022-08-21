@@ -9,31 +9,19 @@ import { useSocket } from "./customHooks/useSocket";
 import { SOCKET_BASE_URL } from "./components/constants/apiConstants";
 
 function App() {
-  // const { data, isConnected } = useSocket("gurkan");
-
-  // const navigateHandler = useCallback(
-  //   (event, page) => {
-  //     // some api
-  //     // ...
-  //     displayAlert("Some alert");
-  //   },
-  //   [displayAlert]
-  // );
-
-  // const {displayAlert} = useSomething();
-
   const { data, isConnected, sendData } = useSocket("gurkan");
 
   return (
     <div className="App">
       <Home />
       <h3>{`CONNECTED: ${isConnected}`}</h3>
+      <h3>{`DATA: ${JSON.stringify(data)}`}</h3>
       <button
         onClick={(e) => {
           sendData({
             room: "gurkan",
-            commandName: "PLAY",
-            value: "123",
+            commandName: "VOLUME",
+            value: "100",
           });
         }}
       >
