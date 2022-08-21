@@ -1,0 +1,10 @@
+.circle_button {
+  border-radius: 50%;
+  height: 50px;
+  width: 50px;
+  background-color: #ffa93c;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  cursor: pointer;
+}

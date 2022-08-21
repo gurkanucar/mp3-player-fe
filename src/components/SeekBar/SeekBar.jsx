@@ -4,7 +4,7 @@ import "./SeekBar.css";
 
 export const SeekBar = ({ referance, music, onChange }) => {
   return (
-    <div>
+    <div  className="seekBar">
       <input
       className="seekBar_range"
         ref={referance}

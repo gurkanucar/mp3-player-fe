@@ -3,13 +3,12 @@
   display: flex;
   flex-direction: column;
   align-items: flex-end;
-  width: 55%;
+  width: 61%;
   border-radius: 20px;
   padding: 20px;
 }
 
 .home_player_row {
-  margin-right: 100px;
   display: flex;
   flex-direction: row;
   justify-content: center;
@@ -17,6 +16,7 @@
   gap: 10px;
   font-size: 19px;
   font-weight: 600;
+  width: 100%;
   margin-bottom: 15px;
   color: #ffa93c;
 }
@@ -25,4 +25,8 @@
   display: flex;
   justify-content: center;
   margin: 20px;
+}
+
+.elapsed_time {
+  width: 60px;
 }

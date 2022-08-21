@@ -1,7 +1,10 @@
 .seekBar_range {
   accent-color: #ffa93c;
-  width: 100px;
-  width: 800px;
+  width: 100%;
   background: #282a36;
   border-radius: 8px;
+}
+
+.seekBar {
+  width: 100%;
 }
