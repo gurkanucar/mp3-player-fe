@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from "react";
-import ReactPlayer from "react-player/lazy";
+import ReactAudioPlayer from "react-audio-player";
 import {
   COMMAND_PAUSE,
   COMMAND_PLAY,
@@ -7,153 +7,142 @@ import {
   COMMAND_STOP,
   COMMAND_VOLUME,
 } from "../constants/commandNames";
-
 import { commandProcessor } from "../util/commandProcessor";
-export const Home = ({ socketResponse, sendData, music }) => {
-  const [playing, setPlaying] = useState(true);
 
-  const [volume, setVolume] = useState(100);
-
+export const HomePage = ({ music, socketResponse, sendData }) => {
   const player = useRef();
   const seekBar = useRef();
-  const elapsedTime = useRef();
+  const volumeBar = useRef();
 
-  const stopMusic = () => {
-    setPlaying(false);
-    player.current.seekTo(0);
+  const onVolumeBarChange = (val) => {
+    sendDataToSocket(COMMAND_VOLUME, val);
+    player.current.volume = val / 100;
   };
 
-  const pauseMusic = () => {
-    setPlaying(false);
+  const onSeekBarSeekChange = (val) => {
+    sendDataToSocket(COMMAND_SEEK_TO, val);
+    player.current.currentTime = val;
   };
 
-  const seekTo = (val) => {
-    player.current.seekTo(val);
-    console.log("seekTo called", val);
+  const onPlaying = (e) => {
+    console.log("playing: ", player.current.currentTime);
+    seekBar.current.value = player.current.currentTime;
   };
 
-  const seekSend = (val) => {
+  const sendDataToSocket = (commandName, value) => {
+    console.log("sendDataToSocket", commandName);
     sendData({
       room: "gurkan",
-      commandName: "SEEK_TO",
-      value: val.toString(),
+      commandName: commandName,
+      value: value.toString(),
     });
-    console.log("seek send");
   };
 
-  const setVolumeFromSocket = (val) => {
-    setVolume(val);
+  const playMusicFromSocket = () => {
+    player.current.play();
   };
 
-  const volumeSend = (val) => {
-    setVolume(val);
-    sendData({
-      room: "gurkan",
-      commandName: "VOLUME",
-      value: val,
-    });
-    console.log("volumeSend");
+  const pauseMusicFromSocket = () => {
+    player.current.pause();
   };
 
-  const onSeek = (e) => {
-    console.log("onSeek", e);
-    seekBar.current.value = player.current.getCurrentTime();
-    elapsedTime.current.innerHTML = parseInt(player.current.getCurrentTime());
+  const stopMusicFromSocket = () => {
+    player.current.pause();
+    player.current.currentTime = 0;
   };
 
-  const onProgress = (e) => {
-    seekBar.current.value = player.current.getCurrentTime();
-    elapsedTime.current.innerHTML = parseInt(player.current.getCurrentTime());
+  const socketSeekTo = (val) => {
+    console.log("socket seek to");
+    player.current.currentTime = val;
+  };
+
+  const socketVolumeTo = (val) => {
+    player.current.volume = val / 100;
+    volumeBar.current.value = val;
+    console.log("volume", val);
   };
 
   useEffect(() => {
     commandProcessor(
       socketResponse,
-      setPlaying,
-      pauseMusic,
-      stopMusic,
-      seekTo,
-      setVolumeFromSocket
+      playMusicFromSocket,
+      pauseMusicFromSocket,
+      stopMusicFromSocket,
+      socketSeekTo,
+      socketVolumeTo
     );
-    seekBar.current.max = music.duration;
   }, [socketResponse]);
 
   useEffect(() => {
     seekBar.current.max = music.duration;
-    setPlaying(false);
-  }, [music]);
+  }, []);
+
+  useEffect(() => {
+    console.log(player.current);
+  }, [player.current]);
 
   return (
     <div>
-      <ReactPlayer
-        height="60px"
+      <audio
+        id={"yourAudioTag"}
         ref={player}
-        volume={volume / 100}
-        onProgress={(e) => onProgress(e)}
-        url={music.url}
-        playing={playing}
-        //controls
-        onSeek={onSeek}
-        config={{
-          file: {
-            forceAudio: true,
-          },
-        }}
-      />
+        // controls
+        onTimeUpdate={onPlaying}
+      >
+        <source type="audio/mp3" src={music.url} />
+      </audio>
+
       <input
         ref={seekBar}
         id="seek"
         type="range"
         min={0}
+        max={music.duration}
         onChange={(e) => {
-          seekTo(e.target.value);
-          seekSend(e.target.value);
+          onSeekBarSeekChange(e.target.value);
         }}
         defaultValue={0}
         step="0.25"
         style={{ width: "248px" }}
       />
-
       <input
+        ref={volumeBar}
         id="volume"
         type="range"
         min={0}
-        value={volume}
-        onChange={(e) => volumeSend(e.target.value)}
+        defaultValue={80}
+        onChange={(e) => onVolumeBarChange(e.target.value)}
         max={100}
         step="1"
         style={{ width: "48px" }}
       />
 
-      <button onClick={() => player.current.seekTo(20)}>SeekTo</button>
+      <button onClick={() => (player.current.currentTime = 20)}>SeekTo</button>
       <button
         onClick={() => {
-          setPlaying(true);
-          console.log(player.current.player);
-          sendData({
-            room: "gurkan",
-            commandName: "PLAY",
-            value: "",
-          });
+          player.current.play();
+          sendDataToSocket(COMMAND_PLAY, "");
         }}
       >
         Play
       </button>
       <button
         onClick={() => {
-          pauseMusic();
-          console.log(player.current.player);
-          sendData({
-            room: "gurkan",
-            commandName: "PAUSE",
-            value: "",
-          });
+          player.current.pause();
+          sendDataToSocket(COMMAND_PAUSE, "");
         }}
       >
         Pause
       </button>
-      <button onClick={stopMusic}>Stop</button>
-      <h4 ref={elapsedTime}>0</h4>
+      <button
+        onClick={() => {
+          player.current.pause();
+          player.current.currentTime = 0;
+          sendDataToSocket(COMMAND_STOP, "");
+        }}
+      >
+        Stop
+      </button>
     </div>
   );
 };
