@@ -14,7 +14,7 @@ import {
 import { processCommands } from "../../util/commandProcessor";
 import "./Home.css";
 import {
-  convertSecond,
+  convertSecondText,
   millisToMinutesAndSeconds,
 } from "../../util/secondConverter";
 import { PlayerButtons } from "../../components/PlayerButtons/PlayerButtons";
@@ -25,6 +25,7 @@ export const Home = ({
   sendData,
   isConnected,
   musicList,
+  roomName,
   setSelectedMusic,
 }) => {
   const [playing, setPlaying] = useState(false);
@@ -50,14 +51,14 @@ export const Home = ({
   const onPlaying = (e) => {
     seekBar.current.value = player.current.currentTime;
 
-    elapsedTime.current.innerHTML = convertSecond(
+    elapsedTime.current.innerHTML = convertSecondText(
       parseInt(player.current.currentTime)
     );
   };
 
   const sendDataToSocket = (commandName, value) => {
     sendData({
-      room: "gurkan",
+      room: roomName,
       commandName: commandName,
       value: value?.toString(),
     });

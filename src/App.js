@@ -20,6 +20,9 @@ function App() {
   });
   const [selectedMusic, setSelectedMusic] = useState();
 
+  const [roomName, setRoomName] = useState("");
+  const [openHomePage, setOpenHomePage] = useState(false);
+
   useEffect(() => {
     if (responseData == null || selectedMusic == undefined) return;
     let tmp = { ...selectedMusic };
@@ -31,25 +34,39 @@ function App() {
 
   return (
     <div className="App">
-      <Home
-        musicList={responseData}
-        socketResponse={socketResponse}
-        music={music}
-        sendData={sendData}
-        isConnected={isConnected}
-        setSelectedMusic={setSelectedMusic}
-      />
-      <h3>{`CONNECTED: ${isConnected}`}</h3>
-      <div>
-        {responseData != null ? (
-          <MusicList
+      {roomName != "" && openHomePage == true ? (
+        <>
+          <Home
             musicList={responseData}
+            socketResponse={socketResponse}
+            music={music}
+            roomName={roomName}
+            sendData={sendData}
+            isConnected={isConnected}
             setSelectedMusic={setSelectedMusic}
           />
-        ) : (
-          <span>loading...</span>
-        )}
-      </div>
+          <h3>{`CONNECTED: ${isConnected}`}</h3>
+          <div>
+            {responseData != null ? (
+              <MusicList
+                musicList={responseData}
+                setSelectedMusic={setSelectedMusic}
+              />
+            ) : (
+              <span>loading...</span>
+            )}
+          </div>
+        </>
+      ) : (
+        <div>
+          <input
+            type="text"
+            value={roomName}
+            onChange={(e) => setRoomName(e.target.value)}
+          />
+          <button onClick={() => setOpenHomePage(true)}>Login</button>
+        </div>
+      )}
     </div>
   );
 }
