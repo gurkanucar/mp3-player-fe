@@ -1,4 +1,5 @@
 export const convertSecond = (s) => {
+  if (s == NaN) return "0:00";
   return (s - (s %= 60)) / 60 + (9 < s ? ":" : ":0") + s;
 };
 

@@ -13,7 +13,10 @@ import {
 } from "../../constants/commandNames";
 import { processCommands } from "../../util/commandProcessor";
 import "./Home.css";
-import { convertSecond } from "../../util/secondConverter";
+import {
+  convertSecond,
+  millisToMinutesAndSeconds,
+} from "../../util/secondConverter";
 import { PlayerButtons } from "../../components/PlayerButtons/PlayerButtons";
 
 export const Home = ({
@@ -189,7 +192,7 @@ export const Home = ({
                 seekBarChangeHandler(e.target.value);
               }}
             />
-            <span>{music.duration}</span>
+            <span>{millisToMinutesAndSeconds(music.duration).toString()}</span>
           </div>
         </div>
       </div>

@@ -16,14 +16,14 @@ function App() {
   const { responseData, loading, error } = useFetch("/mp3/music");
   const [music, setMusic] = useState({
     id: -1,
-    duration: "0:00",
+    duration: 0,
   });
   const [selectedMusic, setSelectedMusic] = useState();
 
   useEffect(() => {
     if (responseData == null || selectedMusic == undefined) return;
     let tmp = { ...selectedMusic };
-    tmp.duration = millisToMinutesAndSeconds(tmp.duration).toString();
+    //tmp.duration = millisToMinutesAndSeconds(tmp.duration).toString();
     tmp.url = API_BASE_URL + "/mp3/music/" + tmp.id + ".mp3";
     console.log(tmp);
     setMusic(tmp);

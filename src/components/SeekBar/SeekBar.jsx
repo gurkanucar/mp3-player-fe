@@ -1,4 +1,5 @@
 import React from "react";
+import { convertSecond } from "../../util/secondConverter";
 
 import "./SeekBar.css";
 
@@ -10,7 +11,7 @@ export const SeekBar = ({ referance, music, onChange, onMouseUp }) => {
         ref={referance}
         type="range"
         min={0}
-        max={music.duration}
+        max={convertSecond(music.duration)}
         onMouseUp={onMouseUp}
         onKeyUp={onMouseUp}
         onPointerUp={onMouseUp}
