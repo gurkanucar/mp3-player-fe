@@ -15,7 +15,6 @@ import { processCommands } from "../../util/commandProcessor";
 import "./Home.css";
 import { convertSecond } from "../../util/secondConverter";
 import { PlayerButtons } from "../../components/PlayerButtons/PlayerButtons";
-import { useFetch } from "../../customHooks/useFetch";
 
 export const Home = ({
   music,
@@ -25,11 +24,9 @@ export const Home = ({
   musicList,
   setSelectedMusic,
 }) => {
-  const SEND_SYNC_DATA_INTERVAL = 2300;
-
   const [playing, setPlaying] = useState(false);
 
-  const [synced, setSynced] = useState(true);
+  //const [synced, setSynced] = useState(true);
 
   const player = useRef();
   const seekBar = useRef();
@@ -91,16 +88,12 @@ export const Home = ({
   };
 
   const sync = (val) => {
-    if (!synced) {
-      setSynced(true);
-      player.current.currentTime = val;
-      setPlaying(true);
-      player.current.play();
-    }
+    // NOT IMPLEMENTED
   };
   const open = (val) => {
-    if (val != music.id && val != -1) {
-      setSelectedMusic(val);
+    const newMusic = JSON.parse(val);
+    if (newMusic.id != music.id && newMusic.id != -1) {
+      setSelectedMusic(newMusic);
     }
   };
 
@@ -131,50 +124,24 @@ export const Home = ({
     sendDataToSocket(COMMAND_STOP, "");
   };
   const onPlayClick = () => {
-    setPlaying(true);
-    player.current.play();
-    sendDataToSocket(COMMAND_PLAY, "");
+    if (music.id != -1) {
+      setPlaying(true);
+      player.current.play();
+      sendDataToSocket(COMMAND_PLAY, "");
+    } else {
+      alert("Select a music");
+    }
   };
 
-  //sync operations
-  const [timeLeft, setTimeLeft] = useState(3);
   useEffect(() => {
-    if (!timeLeft) return;
-    const intervalId = setInterval(() => {
-      if (socketResponse.commandName == COMMAND_SYNC) {
-        setSynced(false);
-        setTimeLeft(0);
-      }
-      setTimeLeft(timeLeft - 1);
-    }, 1000);
-    return () => clearInterval(intervalId);
-  }, [timeLeft]);
-
-  //send sync data
-  useEffect(() => {
-    const interval = setInterval(() => {
-      if (isConnected && synced) {
-        const time = player.current.currentTime;
-        sendDataToSocket(COMMAND_SYNC, time + 0.06);
-        if (music.id != -1) {
-          sendDataToSocket(COMMAND_OPEN, music.id);
-        }
-      }
-    }, SEND_SYNC_DATA_INTERVAL);
-    return () => {
-      clearInterval(interval);
-    };
-  }, [isConnected, music]);
-
-  useEffect(() => {
+    console.log("music changed!", music);
     if (isConnected) {
       let audio = player.current;
       if (audio) {
         audio.pause();
         setPlaying(false);
         audio.load();
-        setSynced(false);
-        sendDataToSocket(COMMAND_OPEN, music.id);
+        sendDataToSocket(COMMAND_OPEN, JSON.stringify(music));
       }
     }
   }, [music]);
@@ -191,10 +158,14 @@ export const Home = ({
 
       <div className="home_player_card_root">
         <div className="home_player_card">
-          <VolumeBar
-            referance={volumeBar}
-            onChange={(e) => volumeBarChangeHandler(e.target.value)}
-          />
+          <div className="music_name_volume_bar_row">
+            <h1 className="music_name">{music?.name || "Select a music"}</h1>
+            <VolumeBar
+              referance={volumeBar}
+              onChange={(e) => volumeBarChangeHandler(e.target.value)}
+            />
+          </div>
+
           <div className="home_player_row">
             <div className="player_buttons">
               <PlayerButtons

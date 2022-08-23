@@ -9,6 +9,23 @@
   user-select: none;
 }
 
+.music_name{
+  margin-left: 20px;
+}
+
+.music_name_volume_bar_row {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
+  gap: 10px;
+  font-size: 19px;
+  font-weight: 600;
+  width: 100%;
+  margin-bottom: 15px;
+  color: #ffa93c;
+}
+
 .home_player_row {
   display: flex;
   flex-direction: row;

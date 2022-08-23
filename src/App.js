@@ -13,19 +13,16 @@ import { API_BASE_URL } from "./constants/apiConstants";
 
 function App() {
   const { socketResponse, isConnected, sendData } = useSocket("gurkan");
-
   const { responseData, loading, error } = useFetch("/mp3/music");
-
-  const [selectedMusic, setSelectedMusic] = useState(1);
-
   const [music, setMusic] = useState({
     id: -1,
     duration: "0:00",
   });
+  const [selectedMusic, setSelectedMusic] = useState();
 
   useEffect(() => {
-    if (responseData == null) return;
-    let tmp = { ...responseData.find((x) => x.id == selectedMusic) };
+    if (responseData == null || selectedMusic == undefined) return;
+    let tmp = { ...selectedMusic };
     tmp.duration = millisToMinutesAndSeconds(tmp.duration).toString();
     tmp.url = API_BASE_URL + "/mp3/music/" + tmp.id + ".mp3";
     console.log(tmp);
