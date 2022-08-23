@@ -3,7 +3,7 @@ import { MusicListItem } from "./MusicListItem";
 
 export const MusicList = ({ musicList, setSelectedMusic }) => {
   return (
-    <div>
+    <div className="music_list">
       {musicList.map((x, idx) => (
         <MusicListItem key={idx} item={x} setSelectedMusic={setSelectedMusic} />
       ))}

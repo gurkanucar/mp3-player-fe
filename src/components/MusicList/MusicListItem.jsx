@@ -1,5 +1,11 @@
 import React from "react";
 
+import "./MusicList.css";
+
 export const MusicListItem = ({ item, setSelectedMusic }) => {
-  return <div onClick={() => setSelectedMusic(item.id)}>{item.name}</div>;
+  return (
+    <div className="music_item" onClick={() => setSelectedMusic(item)}>
+      {item.name}
+    </div>
+  );
 };
