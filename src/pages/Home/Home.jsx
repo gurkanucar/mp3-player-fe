@@ -18,19 +18,16 @@ import {
   millisToMinutesAndSeconds,
 } from "../../util/secondConverter";
 import { PlayerButtons } from "../../components/PlayerButtons/PlayerButtons";
+import { useSocket } from "../../customHooks/useSocket";
 
-export const Home = ({
-  music,
-  socketResponse,
-  sendData,
-  isConnected,
-  musicList,
-  roomName,
-  setSelectedMusic,
-}) => {
+export const Home = ({ music, musicList, roomName, setSelectedMusic }) => {
   const [playing, setPlaying] = useState(false);
 
-  //const [synced, setSynced] = useState(true);
+  const { socketResponse, isConnected, sendData } = useSocket(roomName);
+
+  const SYNC_INTERVAL = 3000;
+
+  const [synced, setSynced] = useState(false);
 
   const player = useRef();
   const seekBar = useRef();
@@ -92,8 +89,14 @@ export const Home = ({
   };
 
   const sync = (val) => {
-    // NOT IMPLEMENTED
+    if (synced == true) return;
+    player.current.currentTime = val;
+    setSynced(true);
+    // player.current.load();
+    // player.current.play();
+    // setPlaying(true);
   };
+
   const open = (val) => {
     const newMusic = JSON.parse(val);
     if (newMusic.id != music.id && newMusic.id != -1) {
@@ -145,9 +148,24 @@ export const Home = ({
         audio.pause();
         setPlaying(false);
         audio.load();
+        player.current.play();
+        setPlaying(true);
         sendDataToSocket(COMMAND_OPEN, JSON.stringify(music));
       }
     }
+  }, [music]);
+
+  //auto saver
+  useEffect(() => {
+    if (music.id == -1) return;
+    const interval = setInterval(() => {
+      sendDataToSocket(COMMAND_OPEN, JSON.stringify(music));
+      sendDataToSocket(COMMAND_SYNC, player.current.currentTime);
+    }, SYNC_INTERVAL);
+
+    return () => {
+      clearInterval(interval);
+    };
   }, [music]);
 
   return (
