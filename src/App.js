@@ -2,7 +2,6 @@ import "./App.css";
 import React, { useEffect, useState } from "react";
 import { useSocket } from "./customHooks/useSocket";
 import { Home } from "./pages/Home/Home";
-import { VolumeBar } from "./components/VolumeBar/VolumeBar";
 import { useFetch } from "./customHooks/useFetch";
 import { MusicList } from "./components/MusicList/MusicList";
 import {
@@ -10,9 +9,9 @@ import {
   millisToMinutesAndSeconds,
 } from "./util/secondConverter";
 import { API_BASE_URL } from "./constants/apiConstants";
+import { Login } from "./components/Login/Login";
 
 function App() {
-  const { socketResponse, isConnected, sendData } = useSocket("gurkan");
   const { responseData, loading, error } = useFetch("/mp3/music");
   const [music, setMusic] = useState({
     id: -1,
@@ -32,20 +31,21 @@ function App() {
     setMusic(tmp);
   }, [selectedMusic]);
 
+  const doLogin = () => {
+    if (roomName == "") return;
+    setOpenHomePage(true);
+  };
+
   return (
     <div className="App">
       {roomName != "" && openHomePage == true ? (
         <>
           <Home
             musicList={responseData}
-            socketResponse={socketResponse}
             music={music}
             roomName={roomName}
-            sendData={sendData}
-            isConnected={isConnected}
             setSelectedMusic={setSelectedMusic}
           />
-          <h3>{`CONNECTED: ${isConnected}`}</h3>
           <div>
             {responseData != null ? (
               <MusicList
@@ -58,14 +58,11 @@ function App() {
           </div>
         </>
       ) : (
-        <div>
-          <input
-            type="text"
-            value={roomName}
-            onChange={(e) => setRoomName(e.target.value)}
-          />
-          <button onClick={() => setOpenHomePage(true)}>Login</button>
-        </div>
+        <Login
+          value={roomName}
+          onChange={(e) => setRoomName(e.target.value)}
+          onSubmit={() => doLogin()}
+        />
       )}
     </div>
   );
