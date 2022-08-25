@@ -198,20 +198,24 @@ export const Home = ({ music, musicList, roomName, setSelectedMusic }) => {
               />
             </div>
 
-            <span className="elapsed_time" ref={elapsedTime}>
-              0:00
-            </span>
-            <SeekBar
-              referance={seekBar}
-              music={music}
-              onMouseUp={() => {
-                //onPlayClick();
-              }}
-              onChange={(e) => {
-                seekBarChangeHandler(e.target.value);
-              }}
-            />
-            <span>{millisToMinutesAndSeconds(music.duration).toString()}</span>
+            <div className="seekbar_holder">
+              <span className="elapsed_time" ref={elapsedTime}>
+                0:00
+              </span>
+              <SeekBar
+                referance={seekBar}
+                music={music}
+                onMouseUp={() => {
+                  //onPlayClick();
+                }}
+                onChange={(e) => {
+                  seekBarChangeHandler(e.target.value);
+                }}
+              />
+              <span className="duration">
+                {millisToMinutesAndSeconds(music.duration).toString()}
+              </span>
+            </div>
           </div>
         </div>
       </div>
