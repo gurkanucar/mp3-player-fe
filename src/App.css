@@ -36,3 +36,12 @@
     transform: rotate(360deg);
   }
 }
+
+@media screen and (max-width: 700px) {
+  .music_list_holder {
+    height: 40vh;
+    overflow-y: scroll;
+    flex-direction: column;
+    flex: 1;
+  }
+}

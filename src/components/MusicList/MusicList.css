@@ -23,3 +23,29 @@
   align-items: center;
   flex: 1;
 }
+
+@media screen and (max-width: 700px) {
+  .music_item {
+    margin: 6px;
+    background: #282a36;
+    width: 50%;
+    border-radius: 15px;
+    color: #ffa93c;
+    font-weight: 500;
+    padding: 10px;
+    font-size: 16px;
+    user-select: none;
+    cursor: pointer;
+    transition: ease-in-out 0.2s;
+  }
+
+  .music_item:hover {
+    transform: scale(1.05);
+  }
+
+  .music_list {
+    overflow-y: scroll;
+    flex-direction: column;
+    flex: 1;
+  }
+}

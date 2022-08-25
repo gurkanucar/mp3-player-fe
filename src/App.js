@@ -48,10 +48,12 @@ function App() {
           />
           <div>
             {responseData != null ? (
-              <MusicList
-                musicList={responseData}
-                setSelectedMusic={setSelectedMusic}
-              />
+              <div className="music_list_holder">
+                <MusicList
+                  musicList={responseData}
+                  setSelectedMusic={setSelectedMusic}
+                />
+              </div>
             ) : (
               <span>loading...</span>
             )}
